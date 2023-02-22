@@ -1,15 +1,16 @@
 package com.sultonbek1547.musicplayer.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sultonbek1547.musicplayer.databinding.RvItemBinding
-import com.sultonbek1547.musicplayer.util.Constants.isNextSong
+import com.sultonbek1547.musicplayer.util.Constants.currentPosition
 import com.sultonbek1547.musicplayer.util.Constants.musicDurationList
 
-class RvAdapter(val context: Context, val list: Array<String>, val rvClick: RvClick) :
+class RvAdapter(val context: Context, val list: ArrayList<String>, val rvClick: RvClick) :
     RecyclerView.Adapter<RvAdapter.Vh>() {
 
 
@@ -23,11 +24,12 @@ class RvAdapter(val context: Context, val list: Array<String>, val rvClick: RvCl
             else itemRvBinding.tvDuration.text =
                 "${musicDurationList[position] / 1000 / 60}:${musicDurationList[position] / 1000 % 60}"
 
-
-            if (isNextSong) {
+            if (position== currentPosition){
                 rvClick.updateVariable(itemRvBinding.tvName)
-                isNextSong = false
             }
+
+
+
 
 
 

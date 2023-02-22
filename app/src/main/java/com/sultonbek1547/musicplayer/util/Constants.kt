@@ -1,22 +1,20 @@
 package com.sultonbek1547.musicplayer.util
 
+import android.media.MediaPlayer
 import android.net.Uri
+import android.widget.TextView
+import java.awt.font.TextAttribute
 
 object Constants {
 
-    val musicList = arrayOf(
-        Uri.parse("android.resource://com.sultonbek1547.musicplayer/raw/song"),
-        Uri.parse("android.resource://com.sultonbek1547.musicplayer/raw/clean_bandit"),
-        Uri.parse("android.resource://com.sultonbek1547.musicplayer/raw/day_dream"),
-        Uri.parse("android.resource://com.sultonbek1547.musicplayer/raw/mosaique"),
-        Uri.parse("android.resource://com.sultonbek1547.musicplayer/raw/sing_it_back"),
-        Uri.parse("android.resource://com.sultonbek1547.musicplayer/raw/car_music")
 
-    )
+    var musicList = ArrayList<Uri>()
 
-    val songNames = arrayOf("Worlds Apart", "Clean Bandit", "Day Dream", "Mosaique", "Sing it back","Car Music")
+    var mediaPlayer = MediaPlayer()
+    var currentPosition = 0
+    var isFirstTime = true
 
-    var isNextSong = false
+    val songNames = ArrayList<String>()
 
     var musicDurationList = ArrayList<Int>()
 }

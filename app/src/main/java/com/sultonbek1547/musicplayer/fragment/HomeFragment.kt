@@ -10,13 +10,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.sultonbek1547.musicplayer.R
 import com.sultonbek1547.musicplayer.adapter.RvAdapter
 import com.sultonbek1547.musicplayer.adapter.RvClick
 import com.sultonbek1547.musicplayer.databinding.FragmentHomeBinding
-import com.sultonbek1547.musicplayer.util.Constants.isNextSong
+import com.sultonbek1547.musicplayer.util.Constants
+import com.sultonbek1547.musicplayer.util.Constants.currentPosition
+import com.sultonbek1547.musicplayer.util.Constants.isFirstTime
 import com.sultonbek1547.musicplayer.util.Constants.musicList
 import com.sultonbek1547.musicplayer.util.Constants.songNames
 
@@ -45,19 +48,44 @@ class HomeFragment : Fragment(), RvClick {
             songNames,
             this
         )
-
         binding.myRv.adapter = rvAdapter
 
-        /** default song */
-        mediaPlayer.setDataSource(requireContext(), musicList[0])
-        mediaPlayer.prepare()
-        binding.tvName.text =
-            songNames[0] + "   " + songNames[0] + "   " + songNames[0] + "   "
-        isNextSong = true
-        rvAdapter.notifyItemChanged(0)
-        binding.musicSeekBar.max = mediaPlayer.duration
-        handler.postDelayed(changeSeekBar, 1)
+        /** returning from MusicFragment */
+        if (!isFirstTime){
+            mediaPlayer = Constants.mediaPlayer
+            tempPosition = currentPosition
+            binding.tvName.text = songNames[currentPosition] + "   " + songNames[currentPosition] + "   " + songNames[currentPosition] + "   "
+            binding.musicSeekBar.max = mediaPlayer.duration
+            binding.musicSeekBar.progress = mediaPlayer.currentPosition
+            if (mediaPlayer.isPlaying){
+                binding.btnStart.setImageResource(R.drawable.baseline_pause_circle_outline_24)
+            }else{
+                binding.btnStart.setImageResource(R.drawable.baseline_play_circle_outline_24)
+            }
+            Handler().postDelayed({
+               currentPosition = tempPosition
+                rvAdapter.notifyItemChanged(tempPosition)
+            },10)
 
+        }
+
+
+        /** default song */
+        if (isFirstTime) {
+            isFirstTime = false
+            Handler().postDelayed({
+                mediaPlayer.setDataSource(requireContext(), musicList[0])
+                mediaPlayer.prepare()
+                Toast.makeText(context, "isFirst", Toast.LENGTH_SHORT).show()
+                binding.tvName.text =
+                    songNames[0] + "   " + songNames[0] + "   " + songNames[0] + "   "
+                currentPosition = tempPosition
+                rvAdapter.notifyItemChanged(0)
+                binding.musicSeekBar.max = mediaPlayer.duration
+                handler.postDelayed(changeSeekBar, 1)
+            }, 1000)
+
+        }
 
         /** starting || stopping song */
         binding.btnStart.setOnClickListener {
@@ -80,7 +108,7 @@ class HomeFragment : Fragment(), RvClick {
                 } else {
                     tempPosition = 0
                 }
-                isNextSong = true
+                currentPosition = tempPosition
                 rvAdapter.notifyItemChanged(tempPosition)
                 mediaPlayer.reset()
                 mediaPlayer.setDataSource(requireContext(), musicList[tempPosition])
@@ -105,7 +133,7 @@ class HomeFragment : Fragment(), RvClick {
                 } else {
                     tempPosition = musicList.size - 1
                 }
-                isNextSong = true
+                currentPosition = tempPosition
                 rvAdapter.notifyItemChanged(tempPosition)
                 mediaPlayer.reset()
                 mediaPlayer.setDataSource(requireContext(), musicList[tempPosition])
@@ -126,8 +154,17 @@ class HomeFragment : Fragment(), RvClick {
         }
 
 
+
+        /** getting music from device */
+        binding.toolbar.setOnMenuItemClickListener {
+
+            true
+        }
+
         /** navigating to MusicFragment */
-        binding.tvName.setOnClickListener {
+        binding.btnToMusic.setOnClickListener {
+            Constants.mediaPlayer = mediaPlayer
+            currentPosition = tempPosition
             findNavController().navigate(R.id.musicFragment)
         }
 
@@ -182,7 +219,6 @@ class HomeFragment : Fragment(), RvClick {
     override fun updateVariable(textView: TextView) {
         tempTextview = textView
         tempTextview.setTextColor(Color.parseColor("#0097FF"))
-
     }
 
     private val changeSeekBar = object : Runnable {
